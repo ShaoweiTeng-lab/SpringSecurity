@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +36,13 @@ public class UserServiceImp  implements UserService {
 
     @Override
     public User getUserById(int userId) {
-        return userDao.getUserById( userId);
+        //得到安全上下文驗證身分
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        int securityContextUserId=((UserToken)authentication.getPrincipal()).getUserId();
+        if(securityContextUserId ==userId)
+             return userDao.getUserById( userId);
+        throw   new ResponseStatusException(HttpStatus.BAD_REQUEST);
+
     }
 
     @Override
@@ -81,28 +88,35 @@ public class UserServiceImp  implements UserService {
         //
         //判斷資料庫內有無token
         UserToken userToken = userDao.getTokenByUserId(Integer.parseInt(userId) );
+        JwtUtil jwtUtil = new JwtUtil();
         if (!Objects.isNull(userToken)){
             Map<String,String> map=new HashMap<>();
             map.put("token",userToken.getToken());
             return new ResponseResult(200,"登入成功",map);
         }
 
-        JwtUtil jwtUtil = new JwtUtil();
-
         //判斷是否過期
-        if(jwtUtil.validateToken(userToken.getToken())==null){
+        if(userToken!=null&& jwtUtil.validateToken(userToken.getToken())==null){
             String jwt = jwtUtil.createJwt(userId);
             Map<String,String> map=new HashMap<>();
             map.put("token",jwt);
             userDao.updateUserToken(Integer.parseInt(userId) ,jwt);
             return new ResponseResult(200,"登入成功",map);
         }
-        //生成token 存入 db
-        String jwt = jwtUtil.createJwt(userId);
+
+        if(userToken==null){
+            //判斷沒此token
+            //生成token 存入 db
+            String jwt = jwtUtil.createJwt(userId);
+
+            Map<String,String> map=new HashMap<>();
+            map.put("token",jwt);
+            userDao.createUserToken(Integer.parseInt(userId) ,jwt);
+            return new ResponseResult(200,"登入成功",map);
+        }
 
         Map<String,String> map=new HashMap<>();
-        map.put("token",jwt);
-        userDao.createUserToken(Integer.parseInt(userId) ,jwt);
+        map.put("token",userToken.getToken());
         return new ResponseResult(200,"登入成功",map);
     }
 }

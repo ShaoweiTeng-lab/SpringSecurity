@@ -38,7 +38,7 @@ public class UserController {
         return jwt;
     }
     @GetMapping("/users/{userId}")
-    public ResponseEntity<?> getUserById(@PathVariable("userId")int userId){
+    public ResponseEntity<User> getUserById(@PathVariable("userId")int userId){
         User user= userService.getUserById(userId);
         if(user==null)
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

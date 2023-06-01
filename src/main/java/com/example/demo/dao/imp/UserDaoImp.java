@@ -115,7 +115,7 @@ public class UserDaoImp implements UserDao {
     public void updateUserToken(int userId, String token) {
         String sql ="Update usertoken set token =:token where user_Id = :userId";
         Map<String,Object> map =new HashMap<>();
-        map.put("user_Id", userId);
+        map.put("userId", userId);
         map.put("token", token);
         namedParameterJdbcTemplate.update(sql, map);
     }

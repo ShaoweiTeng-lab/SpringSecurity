@@ -38,12 +38,13 @@ public class JWTFilter extends OncePerRequestFilter {
         Claims claims= jwt.validateToken(token);
         if(claims==null){
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("Token 異常");
+            response.getWriter().println("Token error");
             return;
         }
         userId=claims.getSubject();
 
         UserToken userToken = userDao.getTokenByUserId(Integer.parseInt(userId));
+        System.out.println("db token: \n"+userToken.getToken());
         if(!userToken.getToken().equals(token))//判斷token 與 db上相同
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         User user = userDao.getUserById(Integer.parseInt(userId));
