@@ -34,12 +34,16 @@ public class UserServiceImp  implements UserService {
     @Autowired
     AuthenticationManager authenticationManager;
 
-    @Override
-    public User getUserById(int userId) {
-        //得到安全上下文驗證身分
+    boolean authRequestUserById(int userId){
+        //得到安全上下文驗證身分 (防止 此token 取得他人資料)
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         int securityContextUserId=((UserToken)authentication.getPrincipal()).getUserId();
-        if(securityContextUserId ==userId)
+        return securityContextUserId ==userId;
+    }
+    @Override
+    public User getUserById(int userId) {
+
+        if(authRequestUserById(userId))
              return userDao.getUserById( userId);
         throw   new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
@@ -118,5 +122,14 @@ public class UserServiceImp  implements UserService {
         Map<String,String> map=new HashMap<>();
         map.put("token",userToken.getToken());
         return new ResponseResult(200,"登入成功",map);
+    }
+
+    @Override
+    public ResponseResult logout() {
+        UsernamePasswordAuthenticationToken authentication= (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UserToken principal= (UserToken)authentication.getPrincipal();
+        //刪除 資料庫中的token
+        userDao.deleteUserTokenByID(principal.getUserId());
+        return new ResponseResult(200,"登出成功",null);
     }
 }

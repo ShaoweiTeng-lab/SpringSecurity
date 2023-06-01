@@ -119,4 +119,12 @@ public class UserDaoImp implements UserDao {
         map.put("token", token);
         namedParameterJdbcTemplate.update(sql, map);
     }
+
+    @Override
+    public void deleteUserTokenByID(int userId) {
+        String sql ="delete from usertoken where user_Id = :userId";
+        Map<String, Object> map =new HashMap<>();
+        map.put("userId", userId);
+        namedParameterJdbcTemplate.update(sql, map);
+    }
 }

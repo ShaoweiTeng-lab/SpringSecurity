@@ -15,4 +15,5 @@ public interface UserService {
     void deleteUser(int userId);
 
     ResponseResult login(UserLoginRequest userLoginRequest);
+    ResponseResult logout();
 }

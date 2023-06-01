@@ -66,19 +66,12 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody @Valid UserLoginRequest userLoginRequest)throws Exception{
 
         ResponseResult responseResult= userService.login(userLoginRequest);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String rs =objectMapper.writeValueAsString(responseResult);
         return  ResponseEntity.status(HttpStatus.OK).body(responseResult );
     }
-    @GetMapping("/convert")
-    public  String convert() throws JsonProcessingException {
-        User user = new User();
-        user.setUserId(1);
-        user.setUserName("Jason");
-        user.setUserPassword("Ha");
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(user);
+    @GetMapping("/users/logout")
+    public   ResponseEntity<?> logout()   {
+        ResponseResult rs = userService.logout();
+        return ResponseEntity.status(200).body(rs) ;
     }
 
     @GetMapping("/getUser")
