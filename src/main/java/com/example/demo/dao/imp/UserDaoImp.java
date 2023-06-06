@@ -1,11 +1,13 @@
 package com.example.demo.dao.imp;
 
 import com.example.demo.dao.UserDao;
+import com.example.demo.dao.rowMapper.RoleRowMapper;
 import com.example.demo.dao.rowMapper.UserRowMapper;
 import com.example.demo.dao.rowMapper.UserTokenRowMapper;
 import com.example.demo.dto.UserInsertRequest;
 import com.example.demo.dto.UserLoginRequest;
 import com.example.demo.dto.UserUpdatePasswordRequest;
+import com.example.demo.model.Role;
 import com.example.demo.model.User;
 import com.example.demo.model.UserToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,6 +126,27 @@ public class UserDaoImp implements UserDao {
     public void deleteUserTokenByID(int userId) {
         String sql ="delete from usertoken where user_Id = :userId";
         Map<String, Object> map =new HashMap<>();
+        map.put("userId", userId);
+        namedParameterJdbcTemplate.update(sql, map);
+    }
+
+    @Override
+    public List<Role> getUserRolesByUserId(int userId) {
+        String sql="select  user_role.role_Id,roles.role_Name\n" +
+                "from `user` u\n" +
+                "join user_role on u.user_Id = user_role.user_Id\n" +
+                "join roles on roles.role_Id = user_role.role_Id\n" +
+                "where u.user_Id = :userId";
+        Map<String , Object> map =new HashMap<>();
+        map.put("userId", userId);
+        List<Role> rsList=namedParameterJdbcTemplate.query(sql, map, new RoleRowMapper());
+        return rsList;
+    }
+
+    @Override
+    public void removeUserRoles(int userId) {
+        String sql = "Delete from user_role where user_Id = :userId";
+        Map<String , Object> map =new HashMap<>();
         map.put("userId", userId);
         namedParameterJdbcTemplate.update(sql, map);
     }

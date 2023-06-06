@@ -3,6 +3,7 @@ package com.example.demo.security.filter;
 import com.example.demo.dao.UserDao;
 import com.example.demo.model.User;
 import com.example.demo.model.UserToken;
+import com.example.demo.security.UserDetailsServiceImp;
 import com.example.demo.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ import java.io.IOException;
 public class JWTFilter extends OncePerRequestFilter {
     @Autowired
     UserDao userDao;
+    @Autowired
+    UserDetailsServiceImp userDetailsServiceImp;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("Authorization");
@@ -38,7 +41,8 @@ public class JWTFilter extends OncePerRequestFilter {
         Claims claims= jwt.validateToken(token);
         if(claims==null){
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("Token error");
+            response.setContentType("application/json");
+            response.getWriter().println("Token null");
             return;
         }
         userId=claims.getSubject();
@@ -46,13 +50,15 @@ public class JWTFilter extends OncePerRequestFilter {
         UserToken userToken = userDao.getTokenByUserId(Integer.parseInt(userId));
 
         if(!userToken.getToken().equals(token)){
-            System.out.println("db token 不一至");
+            response.setContentType("application/json");
+
+            response.getWriter().println("Token error");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }//判斷token 與 db上相同
 
         User user = userDao.getUserById(Integer.parseInt(userId));
         //存入SecurityContextHolder
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =new UsernamePasswordAuthenticationToken(userToken,null,null);
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =new UsernamePasswordAuthenticationToken(userToken,null,userDetailsServiceImp.loadUserByUsername(user.getUserName()).getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         filterChain.doFilter(request,response);
     }

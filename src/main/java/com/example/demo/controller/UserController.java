@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -27,18 +28,9 @@ import java.util.Map;
 public class UserController {
     @Autowired
     UserService userService;
-    @GetMapping("/test")
-    public  String Test(){
 
-        JwtUtil jwtUtil=new JwtUtil();
-        Map<String,String>  claims =new HashMap<>();
-        claims.put("userName","1");
-        String jwt = jwtUtil.generateToken(claims);
-
-        return jwt;
-    }
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable("userId")int userId){
+    @GetMapping("/users/{user_Id}")
+    public ResponseEntity<User> getUserById(@PathVariable("user_Id")int userId){
         User user= userService.getUserById(userId);
         if(user==null)
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -56,6 +48,7 @@ public class UserController {
         userService.updatePassword(userUpdatePasswordRequest);
         return  ResponseEntity.status(HttpStatus.OK).body("更新成功");
     }
+    @PreAuthorize("hasAnyAuthority('Manager')")
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable("userId") int userId){
         userService.deleteUser(userId);

@@ -49,15 +49,19 @@ public class JwtUtil {
                     .getBody();
 
         } catch (SignatureException e) {
+            System.out.println("SignatureException");
             //throw new SignatureException("Invalid JWT signature.");
         }
         catch (MalformedJwtException e) {
+            System.out.println("MalformedJwtException");
            // throw new MalformedJwtException("Invalid JWT token.");
         }
         catch (ExpiredJwtException e) {
+            System.out.println("ExpiredJwtException");
            // throw e;
         }
         catch (UnsupportedJwtException e) {
+            System.out.println("UnsupportedJwtException");
            // throw new UnsupportedJwtException("Unsupported JWT token");
         }
         catch (IllegalArgumentException e) {

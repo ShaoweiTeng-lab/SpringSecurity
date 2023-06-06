@@ -77,9 +77,11 @@ public class UserServiceImp  implements UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         userDao.updatePassword( userUpdatePasswordRequest);
     }
-
+    @Transactional
     @Override
     public void deleteUser(int userId) {
+        userDao.removeUserRoles(userId);//先移除權限
+        userDao.deleteUserTokenByID(userId);
         User user= userDao.getUserById( userId);
         if(user==null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
