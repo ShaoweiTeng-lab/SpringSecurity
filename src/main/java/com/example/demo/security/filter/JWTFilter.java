@@ -48,7 +48,7 @@ public class JWTFilter extends OncePerRequestFilter {
         if(!userToken.getToken().equals(token)){
             System.out.println("db token 不一至");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }//判斷token 與 db上相同{}
+        }//判斷token 與 db上相同
 
         User user = userDao.getUserById(Integer.parseInt(userId));
         //存入SecurityContextHolder

@@ -8,6 +8,8 @@ import com.example.demo.model.User;
 
 public interface UserService {
     User getUserById(int userId);
+
+    User getCreateUserById(int userId);
     int createUser(UserInsertRequest userInsertRequest);
 
     User getUserByName(String name);

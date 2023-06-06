@@ -48,7 +48,7 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<?> createUser(@RequestBody @Valid UserInsertRequest userInsertRequest){
         int userId= userService.createUser(userInsertRequest);
-        User user= userService.getUserById(userId);
+        User user= userService.getCreateUserById(userId);
         return  ResponseEntity.status(HttpStatus.OK).body(user);
     }
     @PutMapping("/users")

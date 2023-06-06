@@ -37,6 +37,8 @@ public class UserServiceImp  implements UserService {
     boolean authRequestUserById(int userId){
         //得到安全上下文驗證身分 (防止 此token 取得他人資料)
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        if(authentication==null)
+            return false;
         int securityContextUserId=((UserToken)authentication.getPrincipal()).getUserId();
         return securityContextUserId ==userId;
     }
@@ -50,10 +52,16 @@ public class UserServiceImp  implements UserService {
     }
 
     @Override
+    public User getCreateUserById(int userId) {//防止剛創立沒有token 異常
+        return userDao.getUserById( userId);
+    }
+
+    @Override
     public int createUser(UserInsertRequest userInsertRequest) {
         BCryptPasswordEncoder bCryptPasswordEncoder=new BCryptPasswordEncoder();
         String encodePassword=bCryptPasswordEncoder.encode(userInsertRequest.getPassword());
         userInsertRequest.setPassword(encodePassword);
+        System.out.println("創立角色");
         return userDao.createUser( userInsertRequest);
     }
 
