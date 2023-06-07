@@ -10,6 +10,7 @@ import com.example.demo.model.UserToken;
 import com.example.demo.security.UserDetailsImp;
 import com.example.demo.service.UserService;
 import com.example.demo.utils.JwtUtil;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -103,21 +104,17 @@ public class UserServiceImp  implements UserService {
         //判斷資料庫內有無token
         UserToken userToken = userDao.getTokenByUserId(Integer.parseInt(userId) );
         JwtUtil jwtUtil = new JwtUtil();
-        if (!Objects.isNull(userToken)){
-            Map<String,String> map=new HashMap<>();
-            map.put("token",userToken.getToken());
-            return new ResponseResult(200,"登入成功",map);
-        }
 
+        Claims claim=jwtUtil.validateToken(userToken.getToken());
         //判斷是否過期
-        if(userToken!=null&& jwtUtil.validateToken(userToken.getToken())==null){
+        if(userToken!=null&& claim==null){
             String jwt = jwtUtil.createJwt(userId);
             Map<String,String> map=new HashMap<>();
             map.put("token",jwt);
             userDao.updateUserToken(Integer.parseInt(userId) ,jwt);
             return new ResponseResult(200,"登入成功",map);
         }
-
+        //判斷資料庫內有無token
         if(userToken==null){
             //判斷沒此token
             //生成token 存入 db
