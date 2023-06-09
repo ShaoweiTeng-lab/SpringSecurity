@@ -27,7 +27,7 @@ import java.util.Map;
 @RestController
 public class UserController {
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @GetMapping("/users/{user_Id}")
     public ResponseEntity<User> getUserById(@PathVariable("user_Id")int userId){
@@ -66,7 +66,7 @@ public class UserController {
         ResponseResult rs = userService.logout();
         return ResponseEntity.status(200).body(rs) ;
     }
-
+    //測試用
     @GetMapping("/getUser")
     public  User getUser() throws JsonProcessingException {
         String s ="{\"userId\":1,\"userName\":\"Jason\",\"userPassword\":\"Ha\"}";

@@ -30,10 +30,10 @@ import java.util.Objects;
 @Service
 public class UserServiceImp  implements UserService {
     @Autowired
-    UserDao userDao;
+    private UserDao userDao;
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     boolean authRequestUserById(int userId){
         //得到安全上下文驗證身分 (防止 此token 取得他人資料)

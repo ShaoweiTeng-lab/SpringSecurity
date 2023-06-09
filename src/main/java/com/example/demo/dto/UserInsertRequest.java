@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class UserInsertRequest {
     @NotBlank
-    String userName;
+    private String userName;
     @NotBlank
-    String password;
+    private String password;
 }
