@@ -101,7 +101,7 @@ public class UserServiceImp  implements UserService {
         UserDetailsImp userDetail = (UserDetailsImp) authentication.getPrincipal();
         String userId =String.valueOf( userDetail.getUser().getUserId());
         //
-        //判斷資料庫內有無token
+        //判斷資料庫內有無token(此處雖使用MySQL ,但應使用Redis,須將Token存入Redis)
         UserToken userToken = userDao.getTokenByUserId(Integer.parseInt(userId) );
         JwtUtil jwtUtil = new JwtUtil();
 
@@ -117,7 +117,7 @@ public class UserServiceImp  implements UserService {
         //判斷資料庫內有無token
         if(userToken==null){
             //判斷沒此token
-            //生成token 存入 db
+            //生成token 存入 db(此處雖使用MySQL ,但應使用Redis,須將Token存入Redis)
             String jwt = jwtUtil.createJwt(userId);
 
             Map<String,String> map=new HashMap<>();

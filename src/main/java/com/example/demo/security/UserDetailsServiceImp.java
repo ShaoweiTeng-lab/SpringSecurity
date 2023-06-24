@@ -19,6 +19,9 @@ public class UserDetailsServiceImp implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user =userDao.getUserByName(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("無此user");
+        }
         List<Role> roles=userDao.getUserRolesByUserId(user.getUserId());//從DAO 拿到對應權限
         //查詢對應權限
         List<String> permissionsList=new ArrayList();
