@@ -133,6 +133,7 @@ public class UserServiceImp  implements UserService {
 
     @Override
     public ResponseResult logout() {
+        //取得該筆request 的 SecurityContext (每筆Request都不同)
         UsernamePasswordAuthenticationToken authentication= (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         UserToken principal= (UserToken)authentication.getPrincipal();
         //刪除 資料庫中的token
