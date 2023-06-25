@@ -22,6 +22,7 @@ public class UserDetailsServiceImp implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("無此user");
         }
+        System.out.println("執行認證");
         List<Role> roles=userDao.getUserRolesByUserId(user.getUserId());//從DAO 拿到對應權限
         //查詢對應權限
         List<String> permissionsList=new ArrayList();

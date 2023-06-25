@@ -44,7 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .permitAll();
 
-        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);//設定FILTER 即出現在哪個CLASS 之後
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);//設定FILTER 即出現在哪個CLASS 之前
     }
 
 

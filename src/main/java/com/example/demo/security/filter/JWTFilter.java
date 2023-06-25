@@ -32,6 +32,7 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("Authorization");
         if(!StringUtils.hasText(token)) {
+            //放行  因為沒傳入security contextHolder ，其他過濾器會擋掉
             filterChain.doFilter(request,response);
             return;
         }
@@ -46,7 +47,7 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
         userId=claims.getSubject();
-
+        //之後從redisCache取得
         UserToken userToken = userDao.getTokenByUserId(Integer.parseInt(userId));
 
         if(!userToken.getToken().equals(token)){
@@ -57,7 +58,9 @@ public class JWTFilter extends OncePerRequestFilter {
         }//判斷token 與 db上相同
 
         User user = userDao.getUserById(Integer.parseInt(userId));
+        System.out.println("執行jwt認證");
         //存入SecurityContextHolder
+        //取得權限userDetailsServiceImp.loadUserByUsername(user.getUserName()).getAuthorities() 需改成從redis 取得 否則每次請求都跟mysql 拿
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =new UsernamePasswordAuthenticationToken(userToken,null,userDetailsServiceImp.loadUserByUsername(user.getUserName()).getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         filterChain.doFilter(request,response);
