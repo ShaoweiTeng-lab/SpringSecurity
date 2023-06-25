@@ -30,7 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http
-                .csrf().disable()//關閉CSRF
+                .csrf().disable()//關閉CSRF (等於關閉預設登入頁)
                 //預設 是 從 Session獲取 SecurityContext
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)//關閉SESSION
                 .and()
