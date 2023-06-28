@@ -92,6 +92,7 @@ public class UserServiceImp  implements UserService {
     @Transactional
     @Override
     public ResponseResult login(UserLoginRequest userLoginRequest) {
+        //登入後會取得用戶資訊(包含權限) 並存入redis 讓之後每筆請求透過redis即可
         UsernamePasswordAuthenticationToken authenticationToken =new UsernamePasswordAuthenticationToken(userLoginRequest.getUserName(),userLoginRequest.getPassword());
         Authentication authentication= authenticationManager.authenticate(authenticationToken);//會自動調用 ProvideManager 然後調用 UserDetailsService進行驗證
         if(Objects.isNull(authentication))//傳回空值代表認證失敗
@@ -101,7 +102,7 @@ public class UserServiceImp  implements UserService {
         UserDetailsImp userDetail = (UserDetailsImp) authentication.getPrincipal();
         String userId =String.valueOf( userDetail.getUser().getUserId());
         //
-        //判斷資料庫內有無token(此處雖使用MySQL ,但應使用Redis,須將Token存入Redis)
+        //判斷資料庫內有無token(此處雖使用MySQL ,但應使用Redis,須將Token 及 用戶 訊息(userDetail)(包含權限) 存入Redis)
         UserToken userToken = userDao.getTokenByUserId(Integer.parseInt(userId) );
         JwtUtil jwtUtil = new JwtUtil();
 

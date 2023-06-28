@@ -48,7 +48,7 @@ public class UserController {
         userService.updatePassword(userUpdatePasswordRequest);
         return  ResponseEntity.status(HttpStatus.OK).body("更新成功");
     }
-    @PreAuthorize("hasAnyAuthority('Manager')")
+    //@PreAuthorize("hasAnyAuthority('Manager')")
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable("userId") int userId){
         userService.deleteUser(userId);

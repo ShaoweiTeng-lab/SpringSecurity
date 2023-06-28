@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.example.demo.exceptionHandler.AccessDeniedHandlerImp;
 import com.example.demo.security.filter.JWTFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 
@@ -21,7 +24,12 @@ import org.springframework.security.web.firewall.StrictHttpFirewall;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    JWTFilter jwtAuthFilter;
+    private JWTFilter jwtAuthFilter;
+    @Autowired
+    private AuthenticationEntryPoint authenticationEntryPoint;
+
+    @Autowired
+    private AccessDeniedHandler accessDeniedHandler;
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();//設定加密類型 作為帳密驗證器
@@ -36,6 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/users/login").permitAll()
+                .antMatchers(HttpMethod.DELETE,"/users/*").hasAnyAuthority("Manager") // 需要 ADMIN 角色的 URL
                 .antMatchers(HttpMethod.POST,"/users").permitAll()
                 .anyRequest().authenticated()//除permitAll 以外的api 都必需認證
                 .and()
@@ -45,6 +54,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll();
 
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);//設定FILTER 即出現在哪個CLASS 之前
+
+        //配置異常處理
+        http.exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint)//配置認證失敗
+                .accessDeniedHandler(accessDeniedHandler);//配置授權失敗
+
     }
 
 
