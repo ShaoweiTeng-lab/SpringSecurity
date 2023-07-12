@@ -35,21 +35,10 @@ public class UserServiceImp  implements UserService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    boolean authRequestUserById(int userId){
-        //得到安全上下文驗證身分 (防止 此token 取得他人資料)
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        if(authentication==null)
-            return false;
-        int securityContextUserId=((UserToken)authentication.getPrincipal()).getUserId();
-        return securityContextUserId ==userId;
-    }
+
     @Override
     public User getUserById(int userId) {
-
-        if(authRequestUserById(userId))
-             return userDao.getUserById( userId);
-        throw   new ResponseStatusException(HttpStatus.BAD_REQUEST);
-
+        return userDao.getUserById( userId);
     }
 
     @Override
