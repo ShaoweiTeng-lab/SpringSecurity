@@ -62,6 +62,13 @@ public class JWTFilter extends OncePerRequestFilter {
         //取得權限userDetailsServiceImp.loadUserByUsername(user.getUserName()).getAuthorities() 需改成從redis 取得 否則每次請求都跟mysql 拿
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =new UsernamePasswordAuthenticationToken(userToken,null,userDetailsServiceImp.loadUserByUsername(user.getUserName()).getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+        //Filter 傳入 Attribute
+        request.setAttribute("userID",user.getUserId());
+        System.out.println("setAttribute : "+ request.getAttribute("userID"));
+
         filterChain.doFilter(request,response);
+
+
     }
 }

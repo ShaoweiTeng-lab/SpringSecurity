@@ -19,8 +19,10 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.Key;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +38,30 @@ public class UserController {
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         return  ResponseEntity.status(HttpStatus.OK).body(user);
     }
+
+//    @GetMapping("/users/profile")
+//    public ResponseEntity<?> getUserByAttribute(HttpServletRequest request){
+//        //這樣成功
+//        System.out.println(request.getAttribute("userID"));
+//        User user= userService.getUserById((int)request.getAttribute("userID") );
+//        if(user==null)
+//            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//        return  ResponseEntity.status(HttpStatus.OK).body(user);
+////
+////    }
+
+
+    @GetMapping("/users/profile")
+    public ResponseEntity<?> getUserByAttribute(@RequestAttribute("userID") String userID){
+        //這樣錯誤
+        System.out.println(userID);
+        User user= userService.getUserById(Integer.parseInt(userID));
+        if(user==null)
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return  ResponseEntity.status(HttpStatus.OK).body(user);
+
+    }
+
 
     @PostMapping("/users")
     public ResponseEntity<?> createUser(@RequestBody @Valid UserInsertRequest userInsertRequest){
